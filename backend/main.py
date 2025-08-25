@@ -2,12 +2,14 @@ import os
 from fastapi import FastAPI 
 from analysis import CustomerAnalyzer
 from pydantic import BaseModel , Field
+from core.middleware import setup_cors
 
 
 analyzer = CustomerAnalyzer(data_path="data/shopping_trends.csv")
 
 app = FastAPI()
 
+setup_cors(app)
 
 
 class CustomerProfile(BaseModel):
