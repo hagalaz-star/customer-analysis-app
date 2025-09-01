@@ -1,7 +1,7 @@
 import axios from "axios";
 import { CustomerProfile } from "../types/types";
 
-const API_HOST = "http://localhost:8000";
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:8000";
 
 export async function analyzeCustomer(formData: CustomerProfile) {
   try {
