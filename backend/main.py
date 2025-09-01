@@ -5,7 +5,7 @@ from pydantic import BaseModel , Field
 from core.middleware import setup_cors
 
 
-analyzer = CustomerAnalyzer(data_path="data/shopping_trends.csv")
+analyzer = CustomerAnalyzer(model_path = "model.pkl", scaler_path = "scaler.pkl", columns_path= "columns.pkl")
 
 app = FastAPI()
 

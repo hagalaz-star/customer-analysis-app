@@ -23,8 +23,13 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { toast } from "react-toastify";
 import { analyzeCustomer } from "@/lib/api";
+import AnalysisResultDialog from "./AnalysisResultDialog";
 
 function AnalysisForm() {
+  const [analysisResult, setAnalysisResult] = useState<{
+    name: string;
+    description: string;
+  } | null>(null);
   const [formData, setFormData] = useState<CustomerProfile>({
     Age: 0,
     "Purchase Amount (USD)": 0,
@@ -32,15 +37,40 @@ function AnalysisForm() {
     "Frequency of Purchases": "Weekly",
   });
 
+  const handleResultDialog = () => {
+    setAnalysisResult(null);
+  };
+
+  const handleChange = (
+    name: keyof CustomerProfile,
+    value: CustomerProfile[keyof CustomerProfile]
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async () => {
     console.log("API로 전송할 데이터:", formData);
     toast.info("FastAPI 서버에 분석을 요청했습니다...");
 
     try {
       const result = await analyzeCustomer(formData);
+      console.log("백엔드로부터 실제 받은 result:", result);
 
-      if (result) {
-        toast.success(`분석완료 고객님은 ${result.predict_cluster}`);
+      const analysisData = result.predicted_cluster;
+
+      if (
+        analysisData &&
+        analysisData.cluster_name &&
+        analysisData.cluster_description
+      ) {
+        toast.success(`분석완료 고객님은 ${analysisData.cluster_name}`);
+        setAnalysisResult({
+          name: analysisData.cluster_name,
+          description: analysisData.cluster_description,
+        });
 
         setFormData({
           Age: 0,
@@ -86,8 +116,20 @@ function AnalysisForm() {
               type="number"
               placeholder="예: 35"
               className="bg-slate-800 border-slate-600 w-[143px] col-span-3 justify-self-end"
-              min={0}
-              max={150}
+              value={formData.Age || ""}
+              onChange={(e) => {
+                let age = parseInt(e.target.value, 10) || 0;
+
+                if (age > 150) {
+                  age = 150;
+                }
+
+                if (age < 0) {
+                  age = 0;
+                }
+
+                handleChange("Age", age);
+              }}
             />
           </div>
 
@@ -101,21 +143,56 @@ function AnalysisForm() {
                 type="number"
                 placeholder="예: 20$"
                 className=" bg-slate-800 border-slate-600 w-[120px]"
+                value={formData["Purchase Amount (USD)"] || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  let cost = parseInt(value, 10) || 0;
+
+                  if (cost < 0) {
+                    cost = 0;
+                  }
+
+                  handleChange("Purchase Amount (USD)", cost);
+                }}
               />
-              <span className="text-slate-400">원</span>
+              <span className="text-slate-400">$</span>
             </div>
           </div>
 
           <div className="flex items-center justify-between p-3 bg-slate-800 rounded-md">
-            <Label htmlFor="subscription">정기 구독 여부</Label>
-            <Switch id="subscription" />
+            <div>
+              <Label htmlFor="subscription">정기 구독 여부</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="subscription"
+                checked={formData["Subscription Status"]}
+                onCheckedChange={(checked) =>
+                  handleChange("Subscription Status", checked)
+                }
+              />
+              <Label
+                htmlFor="subscription"
+                className={`font-semibold ${
+                  formData["Subscription Status"]
+                    ? "text-cyan-400"
+                    : "text-gray-500"
+                }`}
+              >
+                {formData["Subscription Status"] ? "구독중" : "미 구독"}
+              </Label>
+            </div>
           </div>
 
           <div className="flex items-center justify-between p-3 gap-4">
             <Label className="text-right" htmlFor="frequency">
               구매 빈도
             </Label>
-            <Select>
+            <Select
+              value={formData["Frequency of Purchases"]}
+              onValueChange={(e) => handleChange("Frequency of Purchases", e)}
+            >
               <SelectTrigger
                 className="col-span-2 bg-slate-800 border-slate-600"
                 id="frequency"
@@ -142,11 +219,19 @@ function AnalysisForm() {
 
         <DialogFooter>
           <div className="flex justify-end mt-4">
-            <Button type="submit" onClick={handleSubmit}>
+            <Button type="button" onClick={handleSubmit}>
               분석하기
             </Button>
           </div>
         </DialogFooter>
+
+        {analysisResult && (
+          <AnalysisResultDialog
+            result={analysisResult}
+            isOpen={!!analysisResult}
+            isClose={handleResultDialog}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

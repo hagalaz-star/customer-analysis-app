@@ -40,9 +40,6 @@ export default function Header({
             </option>
           ))}
         </select>
-      </div>
-
-      <div>
         <AnalysisForm />
       </div>
     </header>
