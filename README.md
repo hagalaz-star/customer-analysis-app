@@ -2,7 +2,7 @@
 
 고객 쇼핑 데이터를 K-평균 클러스터링으로 분석하여 유형별로 그룹화하고, Google Gemini AI를 통해 각 그룹을 대표하는 가상 페르소나를 생성하여 데이터 기반의 맞춤형 마케팅 전략 수립을 돕는 풀스택(Full-stack) 웹 애플리케이션입니다.
 
-✨ **Live Demo**: [customer-analysis-app.vercel.app]
+✨ **Live Demo: [customer-analysis-app.vercel.app]**
 
 ---
 
@@ -26,4 +26,4 @@
 - **Frontend**: React, Next.js, TypeScript, Tailwind CSS, Chart.js
 - **Backend**: Python, FastAPI, Scikit-learn, Pandas
 - **Database & Auth**: Supabase
-- **AI**: Google Gemini API
+- **AI**: Google Gemini A
