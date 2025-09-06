@@ -5,8 +5,16 @@ from pydantic import BaseModel, Field, field_validator
 from core.middleware import setup_cors
 from auth import verify_supabase_token
 
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+model_path = os.path.join(current_dir, "model.pkl")
+scaler_path = os.path.join(current_dir, "scaler.pkl")
+columns_path = os.path.join(current_dir, "columns.pkl")
+
+
 analyzer = CustomerAnalyzer(
-    model_path="model.pkl", scaler_path="scaler.pkl", columns_path="columns.pkl"
+    model_path=model_path, scaler_path=scaler_path, columns_path=columns_path
 )
 
 app = FastAPI()
