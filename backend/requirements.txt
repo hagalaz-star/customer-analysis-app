@@ -6,3 +6,10 @@ numpy
 joblib
 pydantic
 python-dotenv
+PyJWT
+python-jose[cryptography]
+passlib[bcrypt]
+pytest
+httpx
+supabase
+
