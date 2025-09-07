@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 origins = [
     "http://localhost:3000",
     "http://localhost:8000",
-    "http://customer-analysis-app.vercel.app",  # 실제 배포 도메인으로 변경 필요
+    "https://customer-analysis-app.vercel.app",  # 실제 배포 도메인으로 변경 필요
 ]
 
 
