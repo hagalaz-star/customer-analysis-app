@@ -1,10 +1,19 @@
 import os
-from fastapi import FastAPI, Depends
+from dotenv import load_dotenv
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from analysis import CustomerAnalyzer
-from pydantic import BaseModel, Field, field_validator
-from core.middleware import setup_cors
+from pydantic import BaseModel, Field
+from typing import Literal
+from core.middleware import setup_cors, logging_middleware
 from auth import verify_supabase_token
+from core.errors import add_exception_handlers, CustomException
+from core.logging_config import setup_logging
 
+
+# 로깅 설정 실행
+setup_logging()
+
+load_dotenv()
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -19,7 +28,18 @@ analyzer = CustomerAnalyzer(
 
 app = FastAPI()
 
+# 미들웨어 추가 (순서가 중요)
+app.middleware("http")(logging_middleware)  # 로깅 미들웨어를 가장 먼저 추가
 setup_cors(app)
+
+# 예외 핸들러 등록
+add_exception_handlers(app)
+
+
+class AnalysisResult(BaseModel):
+    predicted_cluster: int
+    cluster_name: str
+    cluster_description: str
 
 
 class CustomerProfile(BaseModel):
@@ -33,25 +53,52 @@ class CustomerProfile(BaseModel):
         description="구매 금액은 0 이상이어야 합니다",
     )
     subscription_status: bool = Field(..., alias="Subscription Status")
-    frequency_of_purchases: str = Field(..., alias="Frequency of Purchases")
-
-    @field_validator("frequency_of_purchases")
-    def validate_frequency(cls, v):
-        allowed_values = ["Weekly", "Monthly", "Annually", "Fortnightly", "Quarterly"]
-        if v not in allowed_values:
-            raise ValueError(f"구매 빈도는 {allowed_values} 중 하나여야 합니다")
-        return v
+    frequency_of_purchases: Literal[
+        "Weekly", "Monthly", "Annually", "Fortnightly", "Quarterly"
+    ] = Field(..., alias="Frequency of Purchases")
 
     model_config = {"populate_by_name": True}
 
 
-@app.post("/api/analysis")
+@app.get("/healthz", status_code=status.HTTP_200_OK)
+def health_check():
+    components = {
+        "model": analyzer.model is not None,
+        "scaler": analyzer.scaler is not None,
+        "columns": analyzer.original_columns is not None,
+        "supabase_secret": os.getenv("SUPABASE_JWT_SECRET") is not None,
+    }
+
+    if all(components.values()):
+        return {"status": "ok", "details": "All components are healthy."}
+
+    unhealthy_components = []
+    for name, is_healthy in components.items():
+        if not is_healthy:
+            unhealthy_components.append(name)
+
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail={
+            "status": "unhealthy",
+            "message": "One or more components are not available.",
+            "unhealthy_components": unhealthy_components,
+        },
+    )
+
+
+@app.post("/api/analysis", response_model=AnalysisResult, tags=["analysis"])
 def analysis_customer(
     profile: CustomerProfile, _payload: dict = Depends(verify_supabase_token)
 ):
     try:
         customer_data = profile.model_dump(by_alias=True)
-        predicted_cluster = analyzer.predict_new_customer(customer_data)
-        return {"predicted_cluster": predicted_cluster}
+        result = analyzer.predict_new_customer(customer_data)
+        return AnalysisResult(**result)
+
     except Exception as e:
-        return {"error": "분석 중 오류가 발생했습니다", "status": "failed"}
+        raise CustomException(
+            status_code=500,
+            error_code="ANALYSIS_FAILED",
+            message=f"분석 중 오류가 발생했습니다: {str(e)}",
+        )

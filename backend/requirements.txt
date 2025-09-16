@@ -12,4 +12,5 @@ passlib[bcrypt]
 pytest
 httpx
 supabase
+structlog
 

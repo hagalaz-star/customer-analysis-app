@@ -58,16 +58,17 @@ class CustomerAnalyzer:
 
         new_df_scaled = self.scaler.transform(new_df_processed)
         predicted_cluster = self.model.predict(new_df_scaled)
+        label = int(predicted_cluster[0])
 
         cluster_details = self.cluster_info.get(
-            int(predicted_cluster),
+            label,
             {
                 "name": "분류되지 않음",
                 "description": "데이터를 기반으로 한 유형을 특정하기 어렵습니다.",
             },
         )
         return {
-            "predicted_cluster": int(predicted_cluster),
+            "predicted_cluster": label,
             "cluster_name": cluster_details["name"],
             "cluster_description": cluster_details["description"],
         }
