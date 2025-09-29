@@ -27,3 +27,26 @@
 - **Backend**: Python, FastAPI, Scikit-learn, Pandas
 - **Database & Auth**: Supabase
 - **AI**: Google Gemini A
+
+## ⚡ 빠른 실행(백엔드만)
+
+로컬에서 API만 확인하고 싶다면 다음 순서로 실행하세요.
+
+```
+cp backend/.env.example backend/.env
+make up            # 또는: docker compose up -d --build
+```
+
+확인:
+
+```
+curl -s http://localhost:8000/readyz | jq .
+```
+
+중지:
+
+```
+make down
+```
+
+자세한 내용은 `backend/README.md`를 참고하세요.

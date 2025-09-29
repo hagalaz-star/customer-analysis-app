@@ -1,0 +1,48 @@
+# General
+.git
+.gitignore
+.DS_Store
+*.log
+*.swp
+*.tmp
+
+# Python bytecode/caches
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+**/.pytest_cache/
+.mypy_cache/
+.pyre/
+
+# Virtual environments (do not copy host venv into image)
+venv/
+.venv/
+env/
+**/venv/
+**/.venv/
+**/env/
+
+# Node/Frontend
+node_modules/
+**/node_modules/
+frontend/.next/
+frontend/dist/
+frontend/build/
+frontend/.nuxt/
+frontend/.cache/
+
+# Env files (provided at runtime via compose `env_file`)
+.env
+.env.*
+backend/.env
+
+# IDE/editor
+.vscode/
+.idea/
+*.code-workspace
+
+# Project-specific large/irrelevant files
+backend/venv/

@@ -69,6 +69,48 @@ uvicorn main:app --reload
 
 이제 브라우저에서 http://localhost:8000/docs 로 접속하여 API 문서를 확인하거나, 프론트엔드(http://localhost:3000)와 연동하여 기능을 테스트할 수 있습니다.
 
+### Docker/Compose로 빠르게 실행하기
+
+사전 준비: `.env` 생성
+
+```
+cp backend/.env.example backend/.env
+```
+
+빌드 및 실행
+
+```
+make up   # 또는: docker compose up -d --build
+```
+
+확인
+
+```
+curl -s http://localhost:8000/readyz | jq .
+curl -s http://localhost:8000/healthz | jq .
+```
+
+로그 보기/중지
+
+```
+make logs
+make down
+```
+
+## 🔓 로컬에서 토큰 없이 테스트하는 방법(개발 전용)
+
+개발/로컬 테스트 중에는 인증 없이 `/api/analysis`를 호출하고 싶을 수 있습니다. 아래 환경변수를 설정하면 토큰 검증을 자동으로 생략합니다. 운영 환경에서는 절대 사용하지 마세요.
+
+1) `.env` 파일에 추가
+
+```
+DISABLE_AUTH=1
+```
+
+2) 서버 재시작 후, Swagger UI(`/docs`)에서 `/api/analysis`를 바로 호출하면 200 응답을 받을 수 있습니다.
+
+비활성화하려면 `.env`에서 해당 줄을 제거하거나 값을 `0`으로 바꾸고 서버를 재시작하세요.
+
 📁 프로젝트 구조 및 API
 main.py: FastAPI 애플리케이션의 메인 파일입니다. API 엔드포인트를 정의하고 CORS 설정을 관리합니다.
 
@@ -100,3 +142,9 @@ Request Body:
   "cluster_description": "높은 구매액과 정기 구독을 바탕으로..."
 }
 ```
+
+## 운영 관점 체크(왜 이렇게 구성했나)
+- `/healthz` vs `/readyz`: 프로세스 생존과 외부 의존성(모델/스케일러/컬럼) 준비를 분리했습니다. 배포/오토스케일에서 안전하게 트래픽을 제어하기 위함입니다.
+- 구조적 로깅(요청 ID): 모든 응답에 `X-Request-ID`를 부여해 추적성을 높였습니다. 장애 분석과 모니터링에 유리합니다.
+- `.env.example`: 12‑factor 원칙에 따라 설정을 코드에서 분리했습니다. 로컬은 `DISABLE_AUTH=1`로 개발 편의를 확보하고 운영에서는 제거합니다.
+- 테스트: 핵심 경로 스모크(`/healthz`, `/readyz`, 배치 분석)를 고정 스키마/헤더 계약으로 검증합니다.

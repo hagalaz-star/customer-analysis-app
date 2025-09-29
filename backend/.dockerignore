@@ -1,0 +1,25 @@
+.git
+.gitignore
+.DS_Store
+*.log
+*.swp
+*.tmp
+
+# Python bytecode/caches
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Env files (provided at runtime)
+.env
+
+# Tests are not needed in the runtime image
+tests/

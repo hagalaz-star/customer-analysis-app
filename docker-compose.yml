@@ -1,0 +1,17 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # Create backend/.env from backend/.env.example before running
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+
+    volumes:
+      # 내 컴퓨터의 ./backend 폴더를 컨테이너 안의 /app 폴더와 연결
+      - ./backend:/app
+    working_dir: /app
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+    restart: unless-stopped
