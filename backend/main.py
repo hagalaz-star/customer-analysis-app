@@ -58,7 +58,7 @@ class CustomerProfile(BaseModel):
     )
     subscription_status: bool = Field(..., alias="Subscription Status")
     frequency_of_purchases: Literal[
-        "Weekly", "Monthly", "Annually", "Fortnightly", "Quarterly"
+        "Weekly", "Monthly", "Annually", "Fortnightly", "Quarterly", "Bi-Weekly"
     ] = Field(..., alias="Frequency of Purchases")
 
     #  별칭 이름(alias name)을 기준

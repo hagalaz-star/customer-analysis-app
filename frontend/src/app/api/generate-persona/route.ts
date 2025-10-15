@@ -84,7 +84,7 @@ export async function POST(request: Request) {
 
 고객 정보: "${originalKoreanPrompt}""`;
     const descriptionResult = await genAi.models.generateContent({
-      model: "gemini-1.5-flash-latest",
+      model: "gemini-2.0-flash",
       contents: [{ role: "user", parts: [{ text: descriptionPrompt }] }],
     });
 

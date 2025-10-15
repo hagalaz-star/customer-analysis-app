@@ -59,7 +59,7 @@ function AnalysisForm() {
       const result = await analyzeCustomer(formData);
       console.log("백엔드로부터 실제 받은 result:", result);
 
-      const analysisData = result.predicted_cluster;
+      const analysisData = result;
 
       if (
         analysisData &&
@@ -76,7 +76,7 @@ function AnalysisForm() {
           Age: 0,
           "Purchase Amount (USD)": 0,
           "Subscription Status": false,
-          "Frequency of Purchases": "",
+          "Frequency of Purchases": "Weekly",
         });
       } else {
         toast.error("분석 실패");
