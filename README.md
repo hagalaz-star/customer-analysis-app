@@ -1,52 +1,33 @@
-# 🛍️ AI 기반 고객 쇼핑 트렌드 분석 플랫폼
+# 고객 쇼핑 트렌드 분석 플랫폼
 
-고객 쇼핑 데이터를 K-평균 클러스터링으로 분석하여 유형별로 그룹화하고, Google Gemini AI를 통해 각 그룹을 대표하는 가상 페르소나를 생성하여 데이터 기반의 맞춤형 마케팅 전략 수립을 돕는 풀스택(Full-stack) 웹 애플리케이션입니다.
+이 저장소는 고객 쇼핑 데이터를 실시간으로 분류하고, 각 군집에 대한 페르소나 요약을 제공하는 풀스택 애플리케이션입니다. FastAPI 기반의 API 서버가 예측 결과를 제공하고, Next.js 대시보드가 시각화와 인사이트 탐색을 담당합니다.
 
-✨ **Live Demo**: [customer-analysis-app.vercel.app](https://customer-analysis-app.vercel.app)
+## 라이브 데모
+- [customer-analysis-app.vercel.app](https://customer-analysis-app.vercel.app)
 
----
+## 저장소 구조
+- `frontend` – 고객 유형과 페르소나를 탐색할 수 있는 Next.js 대시보드
+- `backend` – 단일/배치 고객 프로필을 평가하는 FastAPI 서비스
 
-## 📁 프로젝트 구조
+## 주요 기능
+- `backend/pipelines/artifacts/model`에 저장된 K-Means 모델과 StandardScaler를 이용한 실시간 분류
+- Google Gemini를 활용해 생성한 페르소나 설명으로 마케팅/기획 팀의 이해를 지원
+- 구조적 로깅, CORS, 준비성/상태 점검, Supabase JWT 검증(로컬에서는 비활성화 가능)으로 운영 안정성 확보
 
-이 프로젝트는 다음과 같이 두 개의 독립적인 애플리케이션으로 구성된 모노레포(Monorepo) 형식입니다.
+## 기술 스택
+- Frontend: React, Next.js, TypeScript, Tailwind CSS, Chart.js
+- Backend: Python, FastAPI, Pydantic, Uvicorn
+- Data & ML: pandas, scikit-learn, joblib
+- Infrastructure & Tooling: Docker, Supabase, Make, Pytest
 
-- **`/frontend`**: 사용자가 직접 상호작용하는 웹 대시보드입니다. (Next.js)
-- **`/backend`**: 실시간 고객 유형 분석 API를 제공하는 서버입니다. (FastAPI)
+## 백엔드 빠르게 실행하기
+1. `cp backend/.env.example backend/.env`
+2. `make up`
+3. `curl -s http://localhost:8000/readyz | jq .`
+4. 완료 후 `make down`
 
-각 애플리케이션의 상세한 설명과 로컬 환경에서의 실행 방법은 해당 폴더의 `README.md` 파일을 참고해주세요.
+세부 설정과 개발 흐름은 각 애플리케이션의 README를 참고
 
-➡️ **[프론트엔드 상세 설명 보기](./frontend/README.md)**
-
-➡️ **[백엔드 상세 설명 보기](./backend/README.md)**
-
----
-
-## 🛠️ 핵심 기술 스택
-
-- **Frontend**: React, Next.js, TypeScript, Tailwind CSS, Chart.js
-- **Backend**: Python, FastAPI, Scikit-learn, Pandas
-- **Database & Auth**: Supabase
-- **AI**: Google Gemini A
-
-## ⚡ 빠른 실행(백엔드만)
-
-로컬에서 API만 확인하고 싶다면 다음 순서로 실행하세요.
-
-```
-cp backend/.env.example backend/.env
-make up            # 또는: docker compose up -d --build
-```
-
-확인:
-
-```
-curl -s http://localhost:8000/readyz | jq .
-```
-
-중지:
-
-```
-make down
-```
-
-자세한 내용은 `backend/README.md`를 참고하세요.
+## 추가 문서
+- [프론트엔드 README](./frontend/README.md)
+- [백엔드 README](./backend/README.md)

@@ -1,5 +1,5 @@
 import pytest
-from fastapi.testclient import TestClient
+from starlette.testclient import TestClient
 from serving.api.main import app
 
 VALID_CUSTOMER_DATA = {

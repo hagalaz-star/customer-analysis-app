@@ -1,150 +1,96 @@
-# 🤖 AI 고객 분석 API 서버 (FastAPI)
+# 고객 분석 API (FastAPI)
 
-이 프로젝트는 AI 기반 고객 쇼핑 트렌드 대시보드의 백엔드 서버입니다. FastAPI를 기반으로 구축되었으며, Scikit-learn으로 학습된 K-평균 클러스터링 머신러닝 모델을 통해 실시간으로 고객 유형을 분석하는 API를 제공합니다.
+이 백엔드는 쇼핑 트렌드 대시보드를 위해 고객 프로필을 분류하고, 이해하기 쉬운 군집 정보를 반환합니다. 사전에 학습된 K-Means 모델을 로드해 FastAPI 엔드포인트를 통해 실시간 분석을 제공합니다.
 
-프론트엔드 애플리케이션으로부터 고객 데이터를 받아, 해당 고객이 어떤 쇼핑 유형에 속하는지 예측하고 그 결과를 반환하는 핵심적인 역할을 수행합니다.
+## 제공 기능
+- `POST /api/analysis` 하나의 고객 프로필을 즉시 평가
+- `POST /api/analysis/batch` 여러 프로필을 한 번에 분석
+- 각 군집에 이름과 설명을 포함해 결과를 반환하여 비개발자도 해석 가능
+- 운영 환경에서는 Supabase JWT 검증을 강제하고, 로컬 개발 시에는 토글로 비활성화
+- `healthz`, `readyz` 엔드포인트와 구조적 로깅으로 배포/모니터링 편의성 확보
 
-## 🚀 주요 기능
+## 아키텍처 개요
+1. **오프라인 학습** (`pipelines/train/train.py`): 데이터 전처리 후 StandardScaler와 K-Means를 학습하고, 결과물을 `pipelines/artifacts/model` 아래에 저장
+2. **실시간 서빙** (`serving/api/main.py`): CustomerAnalyzer가 모델·스케일러·컬럼 정보를 로드하고, Pydantic 검증을 거쳐 예측 결과와 페르소나 메타데이터를 반환.
 
-**실시간 고객 유형 분석 API**: 사용자가 프론트엔드에서 입력한 고객 프로필(나이, 구매액, 구독 상태 등)을 받아, 입력 검증 후 학습된 모델을 통해 즉시 해당 고객의 유형을 예측합니다.
+학습과 서빙을 분리해 API는 가볍게 유지하면서도, 새 모델을 쉽게 학습·배포.
 
-**머신러닝 모델 서빙**: train.py를 통해 오프라인에서 학습된 K-평균 클러스터링 모델(model.pkl), 데이터 스케일러(scaler.pkl), 그리고 컬럼 정보(columns.pkl)를 joblib을 이용해 로드하여 예측에 사용합니다.
+## 시작하기
 
-**안전한 API 설계**: Pydantic을 통한 입력 데이터 검증, 적절한 에러 처리, 그리고 CORS 보안 설정을 통해 안정적인 서비스를 제공합니다.
+### 로컬 Python 환경
+1. `python -m venv venv`
+2. 가상환경 활성화
+3. `pip install -r requirements.txt`
+4. `cp .env.example .env` 후 필요한 값을 수정
+5. (선택) 데이터셋을 갱신하거나 재학습하려면 `python pipelines/train/train.py`
+6. `uvicorn serving.api.main:app --reload`
 
-의미 있는 결과 반환: 단순한 클러스터 번호(예: 0, 1)뿐만 아니라, 해당 유형의 **이름("VIP 고객")**과 상세 설명을 함께 JSON 형식으로 반환하여 프론트엔드에서 풍부한 정보를 표시할 수 있도록 합니다.
+Swagger UI는 `http://localhost:8000/docs`에서 확인.
 
-**분리된 모델 학습 로직**: train.py 스크립트를 통해 모델 학습 과정을 API 서버 실행 로직과 완전히 분리하여, 서버가 빠르고 가볍게 시작될 수 있도록 설계되었습니다.
+### Docker / Docker Compose
+1. `cp .env.example .env`
+2. `make up` 혹은 `docker compose up -d --build`
+3. `curl -s http://localhost:8000/readyz | jq .`
+4. 로그 확인은 `make logs`, 종료는 `make down`
 
-## 🛠️ 기술 스택
+## 환경 변수
+| 변수 | 기본값 | 설명 |
+| --- | --- | --- |
+| `DISABLE_AUTH` | `1` | 1이면 Supabase JWT 검증을 생략합니다. 운영에서는 설정하지 마세요. |
+| `SUPABASE_JWT_SECRET` | `changeme` | JWT 검증에 사용하는 HMAC 시크릿 값입니다. |
+| `APP_ENV` | `local` | 로그/모니터링에서 사용할 수 있는 환경 식별자. |
 
-구분 기술
-Framework FastAPI
-Data Handling Pydantic
-ML/Data Analysis Scikit-learn, Pandas
-ML Model Ops Joblib
-Server Uvicorn
-Dependency Python 3.x
+## API 요약
 
-## ⚙️ 시작하기
+### `POST /api/analysis`
+단일 고객 정보를 분석합니다. 요청 본문은 학습 시 사용한 스키마와 동일해야 합니다.
 
-프로젝트의 backend 폴더로 이동합니다.
-
-1. **가상환경 생성 및 활성화**
-   Python 가상환경을 생성하고 활성화합니다.
-
-```bash
-
-# 가상환경 생성 (최초 1회)
-python -m venv venv
-
-# 가상환경 활성화 (Windows)
-.\venv\Scripts\activate
-
-# 가상환경 활성화 (macOS/Linux)
-source venv/bin/activate
-
-```
-
-2.**의존성 설치 (Install Dependencies)**
-
-```bash
-   pip install -r requirements.txt
-
-
-```
-
-3.  **머신러닝 모델 학습 (최초 1회)**
-
-```bash
-python train.py
-
-```
-
-4. **개발서버 진행**
-
-```bash
-uvicorn main:app --reload
-```
-
-이제 브라우저에서 http://localhost:8000/docs 로 접속하여 API 문서를 확인하거나, 프론트엔드(http://localhost:3000)와 연동하여 기능을 테스트할 수 있습니다.
-
-### Docker/Compose로 빠르게 실행하기
-
-사전 준비: `.env` 생성
-
-```
-cp backend/.env.example backend/.env
-```
-
-빌드 및 실행
-
-```
-make up   # 또는: docker compose up -d --build
-```
-
-확인
-
-```
-curl -s http://localhost:8000/readyz | jq .
-curl -s http://localhost:8000/healthz | jq .
-```
-
-로그 보기/중지
-
-```
-make logs
-make down
-```
-
-## 🔓 로컬에서 토큰 없이 테스트하는 방법(개발 전용)
-
-개발/로컬 테스트 중에는 인증 없이 `/api/analysis`를 호출하고 싶을 수 있습니다. 아래 환경변수를 설정하면 토큰 검증을 자동으로 생략합니다. 운영 환경에서는 절대 사용하지 마세요.
-
-1) `.env` 파일에 추가
-
-```
-DISABLE_AUTH=1
-```
-
-2) 서버 재시작 후, Swagger UI(`/docs`)에서 `/api/analysis`를 바로 호출하면 200 응답을 받을 수 있습니다.
-
-비활성화하려면 `.env`에서 해당 줄을 제거하거나 값을 `0`으로 바꾸고 서버를 재시작하세요.
-
-📁 프로젝트 구조 및 API
-main.py: FastAPI 애플리케이션의 메인 파일입니다. API 엔드포인트를 정의하고 CORS 설정을 관리합니다.
-
-analysis.py: CustomerAnalyzer 클래스가 정의된 파일입니다. 저장된 모델과 스케일러를 로드하고, 새로운 고객 데이터에 대한 예측을 수행하는 핵심 로직이 담겨있습니다.
-
-train.py: shopping_trends.csv 데이터를 읽어 K-평균 클러스터링 모델을 학습시키고, 결과를 파일(model.pkl, scaler.pkl 등)로 저장하는 스크립트입니다.
-
-data/: 원본 데이터 파일(shopping_trends.csv)이 위치한 디렉토리입니다.
-
-API Endpoint: POST /api/analysis
-설명: 고객 프로필 데이터를 받아 AI 모델을 통해 고객 유형을 분석합니다.
-
-Request Body:
-
-```JSON
+```json
 {
   "Age": 35,
   "Purchase Amount (USD)": 50,
-  "Subscription Status": true,
-  "Frequency of Purchases": "Weekly"
+  "Subscription Status": "Yes",
+  "Frequency of Purchases": "Monthly"
 }
 ```
 
-```JSON
+응답 예시:
 
+```json
 {
   "predicted_cluster": 1,
   "cluster_name": "충성도 높은 VIP 고객",
-  "cluster_description": "높은 구매액과 정기 구독을 바탕으로..."
+  "cluster_description": "높은 구매액과 정기 구독을 바탕으로 저희 서비스를 가장 활발하게 이용하는 VIP 고객입니다."
 }
 ```
 
-## 운영 관점 체크(왜 이렇게 구성했나)
-- `/healthz` vs `/readyz`: 프로세스 생존과 외부 의존성(모델/스케일러/컬럼) 준비를 분리했습니다. 배포/오토스케일에서 안전하게 트래픽을 제어하기 위함입니다.
-- 구조적 로깅(요청 ID): 모든 응답에 `X-Request-ID`를 부여해 추적성을 높였습니다. 장애 분석과 모니터링에 유리합니다.
-- `.env.example`: 12‑factor 원칙에 따라 설정을 코드에서 분리했습니다. 로컬은 `DISABLE_AUTH=1`로 개발 편의를 확보하고 운영에서는 제거합니다.
-- 테스트: 핵심 경로 스모크(`/healthz`, `/readyz`, 배치 분석)를 고정 스키마/헤더 계약으로 검증합니다.
+### `POST /api/analysis/batch`
+`{ "profiles": [...] }` 형태로 여러 프로필을 보내면, 단일 분석과 동일한 구조의 결과 배열을 반환한다.
+
+### `GET /readyz`
+모델, 스케일러, 컬럼 정보가 메모리에 정상 로드되었는지 확인합니다. 누락 시 503을 반환한다.
+
+### `GET /healthz`
+`readyz` 결과에 더해 `SUPABASE_JWT_SECRET` 설정 여부를 점검해 잘못된 배포를 조기에 감지한다.
+
+## 테스트
+- `make test` : 컨테이너 환경에서 Pytest 실행
+- `make test-local` : 로컬에서 `backend` 디렉터리 기준 Pytest 실행
+
+## 프로젝트 구조
+```
+backend/
+├── serving/
+│   ├── api/          # FastAPI 진입점과 인증 헬퍼
+│   └── models/       # CustomerAnalyzer 및 ML 자산 래퍼
+├── pipelines/
+│   ├── data/         # 원본 데이터셋
+│   ├── train/        # 오프라인 학습 스크립트
+│   └── artifacts/    # 스케일러·모델·컬럼 직렬화 파일
+├── operation/        # 로깅, 미들웨어, 에러 처리 모듈
+├── tests/            # Pytest 스모크/계약 테스트
+├── Dockerfile
+└── requirements.txt
+```
+
+전체 시스템 구성과 프론트엔드 연동은 루트 README에서 확인할 수 있다.

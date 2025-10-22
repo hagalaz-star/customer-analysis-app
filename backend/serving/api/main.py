@@ -59,7 +59,9 @@ class CustomerProfile(BaseModel):
             description="구매 금액은 0 이상이어야 합니다",
         ),
     ]
-    subscription_status: Annotated[bool, Field(..., alias="Subscription Status")]
+    subscription_status: Annotated[
+        Literal["Yes", "No"], Field(..., alias="Subscription Status")
+    ]
     frequency_of_purchases: Annotated[
         Literal[
             "Weekly",

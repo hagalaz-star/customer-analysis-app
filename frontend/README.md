@@ -1,8 +1,6 @@
 # 🛍️ AI 기반 고객 쇼핑 트렌드 대시보드
 
-고객 쇼핑 데이터를 K-평균 클러스터링으로 분석하여 의미 있는 고객 그룹을 정의하고, 각 그룹의 특징을 시각화하는 웹 대시보드입니다. Google Gemini AI를 통해 각 고객 그룹을 대표하는 가상의 페르소나를 생성하고, 데이터 기반의 맞춤형 마케팅 전략을 제안받을 수 있습니다.
-
-**✨ Live Demo: [https://shoppingtrendai.netlify.app/]**
+고객 쇼핑 데이터를 K-평균 클러스터링으로 분석하여 의미 있는 고객 그룹을 정의하고, 각 그룹의 특징을 시각화하는 웹 대시보드입니다. Google Gemini AI를 통해 각 고객 그룹을 대표하는 가상의 페르소나를 생성하고, 데이터 기반의 맞춤형 마케팅 전략을 제안받을 수 있다.
 
 ---
 
@@ -49,18 +47,18 @@
 
 3.  **Supabase 프로젝트 설정**
 
-    - Supabase에서 새 프로젝트를 생성합니다.
+    - Supabase에서 새 프로젝트를 생성.
 
-    - SQL Editor에서 personas 테이블 생성 스크립트를 실행합니다. (이전 대화 내용 참고)
+    - SQL Editor에서 personas 테이블 생성 스크립트를 실행. (이전 대화 내용 참고)
 
-    - Authentication > Providers 메뉴에서 Email과 Google 로그인을 활성화합니다.
+    - Authentication > Providers 메뉴에서 Email과 Google 로그인을 활성.
 
-    - Authentication > Users 메뉴에서 게스트 로그인을 위한 계정을 수동으로 생성합니다.
+    - Authentication > Users 메뉴에서 게스트 로그인을 위한 계정을 수동으로 생성.
 
 4.  **환경 변수 설정 (.env.local)**
 
-    - 프로젝트 루트에 `.env.local` 파일을 생성합니다.
-    - Google AI Studio에서 발급받은 API 키를 아래와 같이 추가합니다.
+    - 프로젝트 루트에 `.env.local` 파일을 생성.
+    - Google AI Studio에서 발급받은 API 키를 아래와 같이 추가.
 
       ```bash
       NEXT_PUBLIC_SUPABASE_URL=당신의_Supabase_프로젝트_URL
@@ -78,7 +76,7 @@
     ```bash
     npm run dev
     ```
-    이제 브라우저에서 `http://localhost:3000`으로 접속하여 대시보드를 확인할 수 있습니다.
+    이제 브라우저에서 `http://localhost:3000`으로 접속하여 대시보드를 확인.
 
 ---
 
@@ -86,7 +84,7 @@
 
 ### 1. 데이터 분석 및 모델링
 
-대시보드에 사용된 데이터는 `shopping_trends_updated.csv` 파일을 기반으로 오프라인에서 분석 및 가공되었습니다. 전체 분석 과정과 코드는 아래 Jupyter Notebook에서 확인하실 수 있습니다.
+대시보드에 사용된 데이터는 `shopping_trends_updated.csv` 파일을 기반으로 오프라인에서 분석 및 가공. 전체 분석 과정과 코드는 아래 Jupyter Notebook에서 확인하실 수 있습니다.
 
 > ➡️ **[전체 분석 과정 및 코드 보기](./notebooks/Shopping_Trends.ipynb)**
 
@@ -95,7 +93,7 @@
   _(참고: 아래 이미지는 실제 분석 결과 그래프로 교체해야 합니다.)_
   - ![Elbow Method for Optimal K](./notebooks/images/Elbow.png)
   - ![Silhouette Analysis for Optimal K](./notebooks/images/Silhouette.png)
-- **결과 데이터 생성**: 각 클러스터의 특성 데이터와 함께, 비교 분석을 위한 **전체 고객 아이템별 평균 구매율** 데이터를 `overall_items_purchase_rate`로 추가하여 최종 `customer_segments_final.json` 파일을 생성했습니다.
+- **결과 데이터 생성**: 각 클러스터의 특성 데이터와 함께, 비교 분석을 위한 **전체 고객 아이템별 평균 구매율** 데이터를 `overall_items_purchase_rate`로 추가하여 최종 `customer_segments_final.json` 파일을 생성.
 
 ### 2. AI 기능 구현
 
