@@ -55,9 +55,12 @@ class CustomerAnalyzer:
         new_df_processed = new_df_processed[self.original_columns]
 
         new_df_scaled = self.scaler.transform(new_df_processed)
+        # 학습때 컬럼이름이 붙어있지만 예측할때는 없는 배열로 주기때문에  결과에는 영향없다.
+        new_df_scaled = pd.DataFrame(new_df_scaled, columns=self.original_columns)
+
         predicted_cluster = self.model.predict(new_df_scaled)
         label = int(predicted_cluster[0])
-
+        # 키 값  기본값 설정
         cluster_details = self.cluster_info.get(
             label,
             {
