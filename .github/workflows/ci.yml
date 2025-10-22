@@ -23,6 +23,8 @@ jobs:
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       # Python 최적화: 바이트코드 파일 생성 안 함
       PYTHONDONTWRITEBYTECODE: "1"
+      
+      PYTHONPATH: .
     steps:
       - name: Checkout
         uses: actions/checkout@v4
