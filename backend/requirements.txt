@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-scikit-learn
+scikit-learn>=1.4
 pandas
 numpy
 joblib
@@ -13,4 +13,5 @@ pytest
 httpx
 supabase
 structlog
+pydantic-settings
 
