@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException, status
 from ..models.analysis import CustomerAnalyzer
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Literal
 from operation.core.middleware import setup_cors, logging_middleware
 from .auth import optional_verify_supabase_token
@@ -59,7 +59,14 @@ class CustomerProfile(BaseModel):
             description="구매 금액은 0 이상이어야 합니다",
         ),
     ]
-    subscription_status: Annotated[str | bool, Field(..., alias="Subscription Status")]
+    subscription_status: Annotated[
+        str | bool,
+        Field(
+            ...,
+            alias="Subscription Status",
+            description='문자열 "Yes"/"No" 또는 bool',
+        ),
+    ]
     frequency_of_purchases: Annotated[
         Literal[
             "Weekly",
@@ -178,3 +185,17 @@ def readiness_check():
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         detail={"status": "not_ready", "unhealthy_compoents": unhealthy},
     )
+
+
+model_config = {"populate_by_name": True}
+
+
+@field_validator("subscription_status")
+@classmethod
+def normalize_subscription(cls, value: str | bool) -> str:
+    if isinstance(value, bool):
+        return "Yes" if value else "No"
+    normalized = value.strip().title()
+    if normalized not in {"Yes", "No"}:
+        raise ValueError('Subscription Status must be "Yes" or "No".')
+    return normalized
