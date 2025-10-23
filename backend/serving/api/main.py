@@ -83,6 +83,16 @@ class CustomerProfile(BaseModel):
     #  별칭 (alias name) 기준
     model_config = {"populate_by_name": True}
 
+    @field_validator("subscription_status")
+    @classmethod
+    def normalize_subscription(cls, value: str | bool) -> str:
+        if isinstance(value, bool):
+            return "Yes" if value else "No"
+        normalized = value.strip().title()
+        if normalized not in {"Yes", "No"}:
+            raise ValueError('Subscription Status must be "Yes" or "No".')
+        return normalized
+
 
 # 여러 고객 정보의 리스트 클래스
 class BatchRequest(BaseModel):
@@ -188,14 +198,3 @@ def readiness_check():
 
 
 model_config = {"populate_by_name": True}
-
-
-@field_validator("subscription_status")
-@classmethod
-def normalize_subscription(cls, value: str | bool) -> str:
-    if isinstance(value, bool):
-        return "Yes" if value else "No"
-    normalized = value.strip().title()
-    if normalized not in {"Yes", "No"}:
-        raise ValueError('Subscription Status must be "Yes" or "No".')
-    return normalized
