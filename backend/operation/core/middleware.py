@@ -11,7 +11,8 @@ log = structlog.get_logger()
 origins = [
     "http://localhost:3000",
     "http://localhost:8000",
-    "https://customer-analysis-app.vercel.app",  # 실제 배포 도메인으로 변경 필요
+    "https://customer-analysis-app.vercel.app",
+    "customer-analysis-app-k9lk.vercel.app",  # 실제 배포 도메인으로 변경 필요
 ]
 
 

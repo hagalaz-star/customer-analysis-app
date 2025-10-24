@@ -195,6 +195,3 @@ def readiness_check():
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         detail={"status": "not_ready", "unhealthy_compoents": unhealthy},
     )
-
-
-model_config = {"populate_by_name": True}
