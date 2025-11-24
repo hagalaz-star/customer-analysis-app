@@ -30,6 +30,7 @@ function AnalysisForm() {
     name: string;
     description: string;
   } | null>(null);
+  
   const [formData, setFormData] = useState<CustomerProfile>({
     Age: 0,
     "Purchase Amount (USD)": 0,

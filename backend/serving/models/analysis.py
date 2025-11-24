@@ -51,10 +51,11 @@ class CustomerAnalyzer:
         for col in self.original_columns:
             if col not in new_df_processed.columns:
                 new_df_processed[col] = 0
-
+        # 강제 정렬
         new_df_processed = new_df_processed[self.original_columns]
 
         new_df_scaled = self.scaler.transform(new_df_processed)
+        
         # 학습때 컬럼이름이 붙어있지만 예측할때는 없는 배열로 주기때문에  결과에는 영향없다.
         new_df_scaled = pd.DataFrame(new_df_scaled, columns=self.original_columns)
 

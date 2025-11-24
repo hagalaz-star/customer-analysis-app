@@ -1,6 +1,9 @@
 import pytest
 from starlette.testclient import TestClient
 from serving.api.main import app
+from dotenv import load_dotenv
+
+load_dotenv()
 
 VALID_CUSTOMER_DATA = {
     "Age": 30,
