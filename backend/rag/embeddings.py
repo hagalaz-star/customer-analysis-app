@@ -43,7 +43,7 @@ def run_embedding_task():
         content = (
             f"유형: {profile['name']}\n"
             f"설명: {profile['description']}\n"
-            "용도: 고객 페르소나 요약"
+            "용도: 고객 페르소나 요약 정리"
         )
         docs.append(
             Document(page_content=content, metadata={"segment_id": key, **profile})
