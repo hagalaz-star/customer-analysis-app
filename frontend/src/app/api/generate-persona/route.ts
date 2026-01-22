@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     if (!apiKey) {
       return NextResponse.json(
         { error: `AI API 키가 설정되지 않았습니다.` },
-        { status: 500 }
+        { status: 500 },
       );
     }
     if (
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json(
         { error: `유효한 프롬프가 필요합니다` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -39,12 +39,11 @@ export async function POST(request: Request) {
         responseModalities: [Modality.IMAGE, Modality.TEXT],
       },
     });
-
     let imageUrl = "";
 
     if (imageResult.candidates && imageResult.candidates[0]?.content?.parts) {
       const imagePart = imageResult.candidates[0].content.parts.find(
-        (part) => part.inlineData
+        (part) => part.inlineData,
       );
       if (imagePart && imagePart.inlineData) {
         const base64Image = imagePart.inlineData.data;
@@ -56,10 +55,10 @@ export async function POST(request: Request) {
     if (!imageUrl) {
       console.log(
         "Image Generation Failed. AI Response:",
-        JSON.stringify(imageResult, null, 2)
+        JSON.stringify(imageResult, null, 2),
       );
       throw new Error(
-        "AI가 이미지를 생성하지 못했습니다. 프롬프트를 확인하거나 다시 시도해주세요."
+        "AI가 이미지를 생성하지 못했습니다. 프롬프트를 확인하거나 다시 시도해주세요.",
       );
     }
 
@@ -100,7 +99,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error(
-      "Google AI API(@google/genai style) Error in route.ts:', error"
+      "Google AI API(@google/genai style) Error in route.ts:', error",
     );
     let errorMessage = "AI 제안 생성 중 서버에서 오류가 발생했습니다.";
     if (error instanceof Error) {
