@@ -1,4 +1,6 @@
-import { MyDataType, OverallDataSummary } from "@/types/types";
+"use client";
+
+import { CustomerData, MyDataType, OverallDataSummary } from "@/types/types";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,11 +15,10 @@ import {
 import "chart.js/auto";
 import { Bar, Doughnut, PolarArea, Chart } from "react-chartjs-2";
 // import { Pie } from "react-chartjs-2";
-import AiSuggestionBox from "./AiSuggestionBox";
 import { Ban } from "lucide-react";
 import TopPaymentCard from "./TopPaymentCard";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import AiHubSection from "./AiHubSection";
 
 // Chart.js에 필요한 요소들을 등록합니다.
 ChartJS.register(
@@ -34,12 +35,14 @@ interface SegmentDetailsViewProps {
   selectedClusterId: number | null;
   clusters: MyDataType[];
   summary: OverallDataSummary | null;
+  personaData: CustomerData;
 }
 
 export default function SegmentDetailsView({
   selectedClusterId,
   clusters,
   summary,
+  personaData,
 }: SegmentDetailsViewProps) {
   const selectedCluster = clusters.find(
     (cluster) => cluster.cluster_id === selectedClusterId
@@ -360,17 +363,12 @@ export default function SegmentDetailsView({
         </div>
       </div>
 
-      <div>
-        <Separator className="my-8" />
-        <Alert className="text-center p-6">
-          <AlertTitle className="text-2xl font-bold text-gray-800 mb-6">
-            AI 기반 마케팅 제안
-          </AlertTitle>
-          <AlertDescription className="flex justify-center mt-4">
-            <AiSuggestionBox clusterData={selectedCluster} />
-          </AlertDescription>
-        </Alert>
-      </div>
+      <Separator className="my-10" />
+      <AiHubSection
+        selectedCluster={selectedCluster}
+        selectedClusterId={selectedClusterId}
+        personaData={personaData}
+      />
     </div>
   );
 }

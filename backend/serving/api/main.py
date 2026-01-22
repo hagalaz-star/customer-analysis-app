@@ -7,7 +7,7 @@ from operation.core.logging_config import setup_logging
 # 로깅 설정을 왜 여기서 부터 시작한걸까?
 load_dotenv(".env.local")
 
-from .routes import customers_router, analysis_router, monitoring_router
+from .routes import customers_router, analysis_router, monitoring_router, rag_router
 
 # 로깅 설정 실행
 setup_logging()
@@ -18,6 +18,7 @@ app = FastAPI()
 # 라우터 등록
 app.include_router(analysis_router.router, prefix="/api/analysis")
 app.include_router(customers_router.router, prefix="/api/customers")
+app.include_router(rag_router.router, prefix="/api/rag")
 app.include_router(monitoring_router.router)
 
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { MyDataType, CustomerData } from "../../types/types";
+import { MyDataType } from "../../types/types";
 import {
   HeartMinus,
   WalletCards,
@@ -9,7 +9,6 @@ import {
   MousePointerClick,
 } from "lucide-react";
 
-import AiResultDialog from "../features/AiResultDialog";
 import { Separator } from "../ui/separator";
 import { User } from "@supabase/supabase-js";
 import UserMenu from "../auth/UserMenu";
@@ -17,14 +16,12 @@ import UserMenu from "../auth/UserMenu";
 interface ClusterSidebarProps {
   groups: MyDataType[] | null;
   selectedClusterId: number | null;
-  personaData: CustomerData | null;
   user: User | null; // user prop 추가
 }
 
 export default function ClusterSidebar({
   groups,
   selectedClusterId,
-  personaData,
   user,
 }: ClusterSidebarProps) {
   const sideCluster = groups?.find(
@@ -34,10 +31,6 @@ export default function ClusterSidebar({
   const formatPercentManual = (rate: number) => {
     return (rate * 100).toFixed(1) + " %";
   };
-  if (!personaData) {
-    return null; // 혹은 <p>데이터 로딩 중...</p>
-  }
-
   return (
     <div className="h-full bg-blue-950 p-4 text-white flex flex-col ">
       <div className="text-center ">
@@ -104,13 +97,6 @@ export default function ClusterSidebar({
             </span>
           </div>
 
-          <div className="flex justify-center items-center w-full">
-            <AiResultDialog
-              clusterData={sideCluster}
-              selectedClusterId={selectedClusterId}
-              personaData={personaData}
-            />
-          </div>
         </div>
       ) : (
         <div className="flex-1 flex items-center justify-center text-cente ">

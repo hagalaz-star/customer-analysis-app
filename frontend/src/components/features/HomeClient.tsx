@@ -76,7 +76,6 @@ export default function HomeClient({ user }: HomeClientProps) {
           <ClusterSidebar
             groups={customerData.cluster_segments}
             selectedClusterId={selectedClusterId}
-            personaData={customerData}
             user={user}
           />
         }
@@ -85,6 +84,7 @@ export default function HomeClient({ user }: HomeClientProps) {
             selectedClusterId={selectedClusterId}
             clusters={customerData.cluster_segments}
             summary={customerData.overall_data_summary}
+            personaData={customerData}
           />
         }
       />

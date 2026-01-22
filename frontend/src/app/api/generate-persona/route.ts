@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     // --- 1. 이미지 생성을 위한 API 호출 ---
     const imagePrompt = `Generate a single, friendly, cartoon-style illustration of a person based on this context: "${originalKoreanPrompt}"`;
     const imageResult = await genAi.models.generateContent({
-      model: "gemini-2.0-flash-preview-image-generation",
+      model: "gemini-2.5-flash-image",
       contents: [{ role: "user", parts: [{ text: imagePrompt }] }],
       config: {
         responseModalities: [Modality.IMAGE, Modality.TEXT],
