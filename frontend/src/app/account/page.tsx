@@ -9,6 +9,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { BadgeCheckIcon } from "lucide-react";
 import Backbutton from "@/components/features/Backbutton";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,7 @@ export default async function account() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "로그인이 필요합니다." };
+    redirect(`/login?error=${encodeURIComponent("로그인이 필요합니다.")}`);
   }
 
   return (
