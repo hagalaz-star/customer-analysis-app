@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from operation.core.errors import CustomException
 from ..auth import optional_verify_supabase_token
 from ..schemas.rag_schema import RagMatch, RagQuery, RagResponse
-from backend.rag.retriever import retrieve_personas
+from rag.retriever import retrieve_personas
 
 
 router = APIRouter()

@@ -1,5 +1,5 @@
 from services.supabase_client import get_supabase_client
-from backend.rag.embeddings import run_embedding_task
+from rag.embeddings import run_embedding_task
 
 TABLE_NAME = "personas"
 EMBEDDING_COLUMN = "embedding"
