@@ -4,7 +4,63 @@ import Link from "next/link";
 import { login } from "./actions";
 import { loginAsGuest } from "./actions";
 import LoginMessage from "./LoginMessage";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
+import { useFormStatus } from "react-dom";
+
+function GuestLoginButton() {
+  const { pending } = useFormStatus();
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.style.cursor = pending ? "wait" : "";
+    return () => {
+      document.body.style.cursor = "";
+    };
+  }, [pending]);
+
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      aria-busy={pending}
+      className={`flex-1 justify-center rounded-md bg-gray-400 py-2 px-4 font-semibold text-white shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-5 ${
+        pending ? "cursor-wait opacity-70" : "hover:bg-indigo-300"
+      }`}
+    >
+      {pending ? "⏳ 게스트 로그인 중..." : "🔑 Guest Login 바로 체험하기"}
+    </button>
+  );
+}
+
+type LoginButtonProps = {
+  formAction?: (formData: FormData) => void;
+};
+
+function LoginButton({ formAction }: LoginButtonProps) {
+  const { pending } = useFormStatus();
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.style.cursor = pending ? "wait" : "";
+    return () => {
+      document.body.style.cursor = "";
+    };
+  }, [pending]);
+
+  return (
+    <button
+      type="submit"
+      formAction={formAction}
+      disabled={pending}
+      aria-busy={pending}
+      className={`flex-1 justify-center rounded-md bg-gray-400 py-2 px-4 font-semibold text-white shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
+        pending ? "cursor-wait opacity-70" : "hover:bg-indigo-300"
+      }`}
+    >
+      {pending ? "⏳ 로그인 중..." : "Log in"}
+    </button>
+  );
+}
 
 export default function LoginPage() {
   return (
@@ -48,12 +104,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex items-center justify-between gap-4">
-            <button
-              formAction={login}
-              className="flex-1 justify-center rounded-md bg-gray-400 py-2 px-4 font-semibold text-white shadow-sm hover:bg-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Log in
-            </button>
+            <LoginButton formAction={login} />
           </div>
         </form>
 
@@ -61,9 +112,7 @@ export default function LoginPage() {
           action={loginAsGuest}
           className="flex items-center justify-between gap-4"
         >
-          <button className="flex-1 justify-center rounded-md bg-gray-400 py-2 px-4 font-semibold text-white shadow-sm hover:bg-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-5">
-            🔑 Guest Login 바로 체험하기
-          </button>
+          <GuestLoginButton />
         </form>
         <div className="flex mt-4 text-center">
           <Link href="/signup" className="text-gray-600 hover:underline flex-1">
