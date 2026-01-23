@@ -1,17 +1,19 @@
 # 고객 분석 API (FastAPI)
 
-이 백엔드는 쇼핑 트렌드 대시보드를 위해 고객 프로필을 분류하고, 이해하기 쉬운 군집 정보를 반환합니다. 사전에 학습된 K-Means 모델을 로드해 FastAPI 엔드포인트를 통해 실시간 분석을 제공합니다.
+이 백엔드는 쇼핑 트렌드 대시보드를 위해 고객 프로필을 분류하고, 이해하기 쉬운 군집 정보를 반환합니다. 사전에 학습된 K-Means 모델을 로드해 FastAPI 엔드포인트를 통해 실시간 분석을 제공하며, RAG 기반으로 페르소나 근거 데이터를 조회할 수 있습니다.
 
 ## 제공 기능
 - `POST /api/analysis` 하나의 고객 프로필을 즉시 평가
 - `POST /api/analysis/batch` 여러 프로필을 한 번에 분석
 - 각 군집에 이름과 설명을 포함해 결과를 반환하여 비개발자도 해석 가능
+- `POST /api/rag/query` 입력 프로필/텍스트를 기반으로 유사한 페르소나 근거 데이터를 조회
 - 운영 환경에서는 Supabase JWT 검증을 강제하고, 로컬 개발 시에는 토글로 비활성화
 - `healthz`, `readyz` 엔드포인트와 구조적 로깅으로 배포/모니터링 편의성 확보
 
 ## 아키텍처 개요
 1. **오프라인 학습** (`pipelines/train/train.py`): 데이터 전처리 후 StandardScaler와 K-Means를 학습하고, 결과물을 `pipelines/artifacts/model` 아래에 저장
-2. **실시간 서빙** (`serving/api/main.py`): CustomerAnalyzer가 모델·스케일러·컬럼 정보를 로드하고, Pydantic 검증을 거쳐 예측 결과와 페르소나 메타데이터를 반환.
+2. **RAG 임베딩 준비** (`rag/embeddings.py`, `rag/store.py`): 페르소나 문서를 임베딩한 뒤 Supabase `personas` 테이블에 저장
+3. **실시간 서빙** (`serving/api/main.py`): CustomerAnalyzer가 모델·스케일러·컬럼 정보를 로드하고, Pydantic 검증을 거쳐 예측 결과와 페르소나 메타데이터를 반환. RAG 조회 요청은 `rag/retriever.py`를 통해 유사도를 계산해 응답한다.
 
 학습과 서빙을 분리해 API는 가볍게 유지하면서도, 새 모델을 쉽게 학습·배포.
 
@@ -39,6 +41,7 @@ Swagger UI는 `http://localhost:8000/docs`에서 확인.
 | `DISABLE_AUTH` | `1` | 1이면 Supabase JWT 검증을 생략합니다. 운영에서는 설정하지 마세요. |
 | `SUPABASE_JWT_SECRET` | `changeme` | JWT 검증에 사용하는 HMAC 시크릿 값입니다. |
 | `APP_ENV` | `local` | 로그/모니터링에서 사용할 수 있는 환경 식별자. |
+| `OPENAI_API_KEY` | - | RAG 임베딩 생성/조회에 사용하는 OpenAI API 키. |
 
 ## API 요약
 
@@ -67,6 +70,38 @@ Swagger UI는 `http://localhost:8000/docs`에서 확인.
 ### `POST /api/analysis/batch`
 `{ "profiles": [...] }` 형태로 여러 프로필을 보내면, 단일 분석과 동일한 구조의 결과 배열을 반환한다.
 
+### `POST /api/rag/query`
+프로필 또는 자유 입력 텍스트로 페르소나 임베딩을 조회해 유사도 높은 항목을 반환한다.
+
+요청 예시:
+
+```json
+{
+  "profile": {
+    "Age": 35,
+    "Purchase Amount (USD)": 50,
+    "Subscription Status": "Yes",
+    "Frequency of Purchases": "Monthly"
+  },
+  "top_k": 1
+}
+```
+
+응답 예시:
+
+```json
+{
+  "matches": [
+    {
+      "title": "충성도 높은 VIP 고객",
+      "description": "높은 구매액과 정기 구독을 바탕으로 저희 서비스를 가장 활발하게 이용하는 VIP 고객입니다.",
+      "cluster_name": "segment_1",
+      "score": 0.92
+    }
+  ]
+}
+```
+
 ### `GET /readyz`
 모델, 스케일러, 컬럼 정보가 메모리에 정상 로드되었는지 확인합니다. 누락 시 503을 반환한다.
 
@@ -87,6 +122,7 @@ backend/
 │   ├── data/         # 원본 데이터셋
 │   ├── train/        # 오프라인 학습 스크립트
 │   └── artifacts/    # 스케일러·모델·컬럼 직렬화 파일
+├── rag/              # 임베딩 생성, 저장, 검색 로직
 ├── operation/        # 로깅, 미들웨어, 에러 처리 모듈
 ├── tests/            # Pytest 스모크/계약 테스트
 ├── Dockerfile
