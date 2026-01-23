@@ -4,7 +4,7 @@ import Link from "next/link";
 import { login } from "./actions";
 import { loginAsGuest } from "./actions";
 import LoginMessage from "./LoginMessage";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 function GuestLoginButton() {
@@ -63,12 +63,38 @@ function LoginButton({ formAction }: LoginButtonProps) {
 }
 
 export default function LoginPage() {
+  const [warmupStatus, setWarmupStatus] = useState<
+    "idle" | "warming" | "ready"
+  >("idle");
+
+  useEffect(() => {
+    const apiHost = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:8000";
+    const controller = new AbortController();
+
+    setWarmupStatus("warming");
+    fetch(`${apiHost}/healthz`, { signal: controller.signal })
+      .then(() => setWarmupStatus("ready"))
+      .catch((error) => {
+        console.warn("Backend warmup failed:", error);
+        setWarmupStatus("idle");
+      });
+
+    return () => controller.abort();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-gray-400">
       <div className="w-full max-w-2xl bg-white rounded-2xl p-8 shadow-md">
         <h1 className="mb-6 text-center font-bold text-gray-600 text-2xl">
           AI Persona
         </h1>
+        {warmupStatus !== "idle" && (
+          <p className="mb-4 text-center text-xs text-gray-500">
+            {warmupStatus === "warming"
+              ? "분석 서버 준비 중..."
+              : "서버 준비 완료"}
+          </p>
+        )}
         <form className="space-y-6">
           <div>
             <label

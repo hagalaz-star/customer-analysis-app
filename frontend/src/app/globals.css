@@ -45,6 +45,14 @@
 
 :root {
   --radius: 0.625rem;
+  --app-bg: #f8fafc;
+  --app-ink: #0f172a;
+  --app-accent: #14b8a6;
+  --app-warm: #f59e0b;
+  --app-accent-soft: rgba(20, 184, 166, 0.18);
+  --app-warm-soft: rgba(245, 158, 11, 0.18);
+  --app-surface: #ffffff;
+  --app-surface-muted: #f1f5f9;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);

@@ -89,9 +89,9 @@ function AnalysisForm() {
   };
 
   return (
-    <Dialog>
+      <Dialog>
       <DialogTrigger asChild>
-        <Button className="bg-blue-600 hover: text-white font-bold text-2xl px-8 py-6 rounded-xl transition-colors">
+        <Button className="rounded-full bg-[color:var(--app-accent)] px-8 py-6 text-lg font-semibold text-slate-900 shadow-lg shadow-emerald-500/20 transition hover:brightness-105">
           AI 고객 유형 분석하기
         </Button>
       </DialogTrigger>

@@ -324,35 +324,53 @@ export default function SegmentDetailsView({
 
   const topPayments = selectedCluster.top_payment.slice(0, 3);
   console.log("실제로 렌더링에 사용되는 topPayments 데이터:", topPayments);
+  const chartCardClass =
+    "rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm";
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="relative h-[400px] w-full">
+    <div className="flex flex-col gap-10 animate-in fade-in duration-500">
+      <div>
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+          Cluster Insight
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-900">
+          {selectedCluster.cluster_name}
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className={`${chartCardClass} h-[320px] sm:h-[360px] lg:h-[380px]`}>
           <Chart type="bar" data={mixedChart} options={mixedChartOption} />
         </div>
 
-        <div className="relative h-[400px] w-full">
+        <div className={`${chartCardClass} h-[320px] sm:h-[360px] lg:h-[380px]`}>
           <Bar data={barLocation} options={locationOption} />
         </div>
 
-        <div className="relative h-[400px] w-full mx-auto max-w-sm">
+        <div
+          className={`${chartCardClass} h-[320px] sm:h-[360px] lg:h-[380px] max-w-xl mx-auto w-full`}
+        >
           <Doughnut data={categoryData} options={categoryOptions} />
         </div>
 
-        <div className="relative h-[400px] w-full">
+        <div className={`${chartCardClass} h-[320px] sm:h-[360px] lg:h-[380px]`}>
           <PolarArea data={seasonPie} options={seasonOptions} />
         </div>
       </div>
 
-      <div className="mt-16">
-        <h3 className="text-xl font-bold mb-4 text-center">
+      <div className="mt-6">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            Payment Spotlight
+          </p>
+          <h3 className="text-xl font-semibold text-slate-900">
           Top Payment Methods
-        </h3>
+          </h3>
+        </div>
 
-        <div className="flex justify-evenly">
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {topPayments.map((payment) => (
-            <div className="w-60" key={payment.payment}>
+            <div key={payment.payment}>
               <TopPaymentCard
                 title={payment.payment}
                 count={payment.cluster_count}

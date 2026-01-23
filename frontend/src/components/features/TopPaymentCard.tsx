@@ -18,12 +18,21 @@ interface PaymentProps {
 
 function TopPaymentCard({ title, percentage }: PaymentProps) {
   return (
-    <Card>
-      <CardHeader className="flex flex-col items-center  space-y-2">
-        <CardTitle className="text-center">{title}</CardTitle>
-        <Image src={iconMap[title]} alt="지불방법" width={100} height={200} />
+    <Card className="rounded-2xl border border-slate-200/70 bg-white/90 shadow-sm">
+      <CardHeader className="flex flex-col items-center space-y-3">
+        <div className="rounded-2xl bg-slate-100 p-3">
+          <Image src={iconMap[title]} alt="지불방법" width={64} height={64} />
+        </div>
+        <CardTitle className="text-center text-base font-semibold text-slate-800">
+          {title}
+        </CardTitle>
       </CardHeader>
-      <CardContent>{`지불 점유율 ${percentage} %`}</CardContent>
+      <CardContent className="text-center text-sm text-slate-500">
+        <span className="block text-2xl font-semibold text-slate-900">
+          {percentage}%
+        </span>
+        지불 점유율
+      </CardContent>
     </Card>
   );
 }
