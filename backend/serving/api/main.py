@@ -4,7 +4,7 @@ from operation.core.middleware import setup_cors, logging_middleware
 from operation.core.errors import add_exception_handlers
 from operation.core.logging_config import setup_logging
 
-# 로깅 설정을 왜 여기서 부터 시작한걸까?
+
 load_dotenv(".env.local")
 
 from .routes import customers_router, analysis_router, monitoring_router, rag_router
@@ -22,8 +22,8 @@ app.include_router(rag_router.router, prefix="/api/rag")
 app.include_router(monitoring_router.router)
 
 
-# 미들웨어 추가
-app.middleware("http")(logging_middleware)  # 로깅 미들웨어를 가장 먼저 추가
+# 로깅 미들웨어를 가장 먼저 추가
+app.middleware("http")(logging_middleware)
 setup_cors(app)
 
 # 예외 핸들러 등록

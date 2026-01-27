@@ -2,9 +2,11 @@ import logging
 import sys
 import structlog
 
+# 로깅 설정 함수
+# 공유 프로세서: 모든 로그 레코드에 공통적으로 적용될 처리 단계
+
 
 def setup_logging():
-    # 공유 프로세서: 모든 로그 레코드에 공통적으로 적용될 처리 단계
     shared_processors = [
         # 특별히 부여된 ID 같은 게 있나?" 하고 주변 컨텍스트를 살핍
         structlog.contextvars.merge_contextvars,

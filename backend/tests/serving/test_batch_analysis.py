@@ -1,4 +1,3 @@
-import pytest
 # FastAPI의 TestClient를 사용해 실제 서버를 띄우지 않고 엔드포인트를 호출
 from starlette.testclient import TestClient
 from serving.api.main import app

@@ -42,11 +42,16 @@ class CustomerProfile(BaseModel):
         Field(..., alias="Frequency of Purchases"),
     ]
 
-    #  별칭 (alias name) 기준
+    #  Pydantic 에서 자동 인식 하는 설정
     model_config = {"populate_by_name": True}
 
+    # Pythantic 에서 제공 하는 도구
+    # "subscription_statu" 값이 들어오면 검사해
     @field_validator("subscription_status")
+    # 클래스 소속선언
     @classmethod
+    # 실제 검사 함수
+    # value: str | bool ->
     def normalize_subscription(cls, value: str | bool) -> str:
         if isinstance(value, bool):
             return "Yes" if value else "No"
