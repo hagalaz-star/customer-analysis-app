@@ -20,6 +20,7 @@ ORDERED_PROFILE_KEYS = (
 )
 
 
+# 사용자의 프로필을 텍스트로 구성
 def build_query_text(
     profile: dict[str, Any] | None = None,
     persona_name: str | None = None,
@@ -55,7 +56,6 @@ def embed_query(text: str) -> list[float]:
     return embeddings.embed_query(text)
 
 
-# supabase select 결과를 dict 리스트로 가정하기 (타입체커용)
 # supabase 에서 페르소나 데이터를 지정한 컬럼으로 조회해 리스트로 반환
 def fetch_personas(
     select_columns: Sequence[str] = DEFAULT_SELECT_COLUMNS,
@@ -64,6 +64,7 @@ def fetch_personas(
     columns = ",".join(select_columns)
     result = supabase.table(TABLE_NAME).select(columns).execute()
     data = result.data or []
+    # supabase select 결과를 dict 리스트로 가정하기 (타입체커용)
     return cast(list[dict[str, Any]], data)
 
 

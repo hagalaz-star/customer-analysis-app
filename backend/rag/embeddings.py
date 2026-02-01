@@ -45,6 +45,7 @@ def run_embedding_task():
             f"설명: {profile['description']}\n"
             "용도: 고객 페르소나 요약 정리"
         )
+        # ** dict를 풀어주는 역할을 함
         docs.append(
             Document(page_content=content, metadata={"segment_id": key, **profile})
         )

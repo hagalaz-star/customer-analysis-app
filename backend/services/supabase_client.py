@@ -4,7 +4,9 @@ from typing import Optional
 
 
 def get_supabase_client() -> Client:
-
+    """
+    Supabase 클라이언트를 생성하고 반환.
+    """
     url: Optional[str] = os.getenv("SUPABASE_URL")
     key: Optional[str] = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 

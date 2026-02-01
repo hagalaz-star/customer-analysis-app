@@ -13,7 +13,7 @@ class CustomerProfile(BaseModel):
         ),
     ]
     purchase_amount: Annotated[
-        float,
+        int,
         Field(
             ...,
             alias="Purchase Amount (USD)",

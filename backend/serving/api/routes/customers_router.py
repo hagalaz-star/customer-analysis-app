@@ -18,10 +18,10 @@ def get_supabase() -> Client:
         )
 
 
-@router.get("/", response_model=List[CustomerProfile], tags=["items"])
+@router.get("/", response_model=List[CustomerProfile], tags=["history"])
 async def read_items(supabase: Client = Depends(get_supabase)):
     try:
-        result = supabase.table("personas").select("*").execute()
+        result = supabase.table("customer_history").select("*").execute()
 
     except Exception as e:
         raise HTTPException(
@@ -35,11 +35,11 @@ async def read_items(supabase: Client = Depends(get_supabase)):
     return result.data
 
 
-@router.post("/", response_model=CustomerProfile, tags=["items"])
+@router.post("/", response_model=CustomerProfile, tags=["history"])
 async def create_items(item: CustomerProfile, supabase: Client = Depends(get_supabase)):
     try:
-        payload = item.model_dump(by_alias=True)
-        result = supabase.table("personas").insert(payload).execute()
+        payload = item.model_dump(by_alias=False)
+        result = supabase.table("customer_history").insert(payload).execute()
 
     except Exception as e:
         raise HTTPException(
@@ -56,13 +56,18 @@ async def create_items(item: CustomerProfile, supabase: Client = Depends(get_sup
         return result.data[0]
 
 
-@router.put("/{item_id}", response_model=List[CustomerProfile], tags=["items"])
+@router.put("/{item_id}", response_model=List[CustomerProfile], tags=["history"])
 async def update_items(
     item_id: int, item: CustomerProfile, supabase: Client = Depends(get_supabase)
 ):
     try:
-        payload = item.model_dump(by_alias=True)
-        result = supabase.table("personas").update(payload).eq("id", item_id).execute()
+        payload = item.model_dump(by_alias=False)
+        result = (
+            supabase.table("customer_history")
+            .update(payload)
+            .eq("id", item_id)
+            .execute()
+        )
 
     except Exception as e:
         raise HTTPException(
@@ -79,11 +84,11 @@ async def update_items(
         return result.data
 
 
-@router.delete("/{item_id}", response_model=List[CustomerProfile], tags=["items"])
+@router.delete("/{item_id}", response_model=List[CustomerProfile], tags=["history"])
 async def delete_items(item_id: int, supabase: Client = Depends(get_supabase)):
     try:
 
-        result = supabase.table("personas").delete().eq("id", item_id).execute()
+        result = supabase.table("customer_history").delete().eq("id", item_id).execute()
 
     except Exception as e:
         raise HTTPException(
