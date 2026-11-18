@@ -5,6 +5,7 @@
 ## 라이브 데모
 
 - [customer-analysis-app.vercel.app](https://customer-analysis-app.vercel.app)
+- ※ 보안 및 API 할당량 정책으로 인해 현재 라이브 데모의 Gemini API 키는 비활성화되어 있습니다.
 
 ## 저장소 구조
 
